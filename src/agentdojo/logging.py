@@ -52,19 +52,19 @@ class NullLogger(Logger):
 
 
 def assistant(text):
-    return f":robot_face: [red]{text}[/red]"
+    return f"[red]{text}[/red]"
 
 
 def tool(text):
-    return f":wrench: [orange]{text}[/orange]"
+    return f"[orange]{text}[/orange]"
 
 
 def user(text):
-    return f":bust_in_silhouette: [green]{text}[/green]"
+    return f"[green]{text}[/green]"
 
 
 def system(text):
-    return f":book: [blue]{text}[/blue]"
+    return f"[blue]{text}[/blue]"
 
 
 class OutputLogger(Logger):

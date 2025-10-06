@@ -299,11 +299,21 @@ def main(
 
 
 if __name__ == "__main__":
+    import sys
     format = "%(message)s"
+    encoding = (getattr(sys.stdout, "encoding", None) or "").lower()
+    use_rich = "utf" in encoding
+    if use_rich:
+        handlers = [RichHandler(show_path=False, markup=True)]
+    else:
+        # Fallback for GBK or other legacy encodings: plain stream handler
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.INFO)
+        handlers = [stream_handler]
     logging.basicConfig(
         format=format,
         level=logging.INFO,
         datefmt="%H:%M:%S",
-        handlers=[RichHandler(show_path=False, markup=True)],
+        handlers=handlers,
     )
     main()

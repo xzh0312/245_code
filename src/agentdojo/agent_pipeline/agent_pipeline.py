@@ -45,6 +45,7 @@ DEFENSES = [
     "transformers_pi_detector",
     "spotlighting_with_delimiting",
     "repeat_user_prompt",
+    "melon",
 ]
 """Available defenses."""
 
@@ -248,6 +249,32 @@ class AgentPipeline(BasePipelineElement):
         if config.defense == "repeat_user_prompt":
             tools_loop = ToolsExecutionLoop([ToolsExecutor(tool_output_formatter), InitQuery(), llm])
             pipeline = cls([system_message_component, init_query_component, llm, tools_loop])
+            pipeline.name = f"{llm_name}-{config.defense}"
+            return pipeline
+        if config.defense == "melon":
+            # Lazy import to avoid hard dependency before MELON is added
+            try:
+                from agentdojo.agent_pipeline.pi_detector import MELON  # type: ignore
+            except Exception as e:
+                raise ValueError(
+                    "MELON defense selected, but MELON is not available. Please add MELON to pi_detector.py."
+                ) from e
+            tools_loop = ToolsExecutionLoop(
+                [
+                    ToolsExecutor(tool_output_formatter),
+                    MELON(
+                        llm,
+                        threshold=0.1,
+                    ),
+                ]
+            )
+
+            pipeline = cls([
+                system_message_component,
+                init_query_component,
+                llm,
+                tools_loop,
+            ])
             pipeline.name = f"{llm_name}-{config.defense}"
             return pipeline
         if config.defense == "spotlighting_with_delimiting":
